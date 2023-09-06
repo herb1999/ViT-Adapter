@@ -48,6 +48,7 @@ def load_state_dict(module, state_dict, strict=False, logger=None):
     """
     unexpected_keys = []
     own_state = module.state_dict()
+
     for name, param in state_dict.items():
         if name not in own_state:
             unexpected_keys.append(name)

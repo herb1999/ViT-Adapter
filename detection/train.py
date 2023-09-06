@@ -11,7 +11,7 @@ import mmcv_custom  # noqa: F401,F403
 import mmdet_custom  # noqa: F401,F403
 import torch
 from mmcv import Config, DictAction
-from mmcv.runner import get_dist_info, init_dist
+from mmcv.runner import get_dist_info, init_dist, load_checkpoint
 from mmcv.utils import get_git_hash
 from mmdet import __version__
 from mmdet.apis import init_random_seed, set_random_seed, train_detector
@@ -23,6 +23,7 @@ from mmdet.utils import collect_env, get_root_logger
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
     parser.add_argument('config', help='train config file path')
+    parser.add_argument('--adapter-path', help='load adapter checkpoint')
     parser.add_argument('--work-dir', help='the dir to save logs and models')
     parser.add_argument('--resume-from',
                         help='the checkpoint file to resume from')
@@ -165,6 +166,9 @@ def main():
                            train_cfg=cfg.get('train_cfg'),
                            test_cfg=cfg.get('test_cfg'))
     model.init_weights()
+    # 加载adapter
+    if args.adapter_path is not None:
+        load_checkpoint(model, args.adapter_path, map_location='cpu')
 
     datasets = [build_dataset(cfg.data.train)]
     if len(cfg.workflow) == 2:
